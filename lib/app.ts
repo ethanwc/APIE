@@ -1,19 +1,17 @@
 // lib/app.ts
 import * as express from "express";
 import * as bodyParser from "body-parser";
-import { Routes } from "./routes/routes";
-import * as pg from 'pg-promise';
+import BaseRouter from './routes'
 
 class App {
 
     public app: express.Application;
-    public routePrv: Routes = new Routes();
+
 
     constructor() {
         this.app = express();
         this.config();    
-        this.connectDB();
-        this.routePrv.routes(this.app);         
+        this.app.use("/api", BaseRouter);
     }
 
     private config(): void{ 
@@ -24,13 +22,13 @@ class App {
 
     }
 
-    private async connectDB(): Promise<void> {
-        const client = new Client()
-        await client.connect()
-        const res = await client.query('SELECT $1::text as message', ['Hello world!'])
-        console.log(res.rows[0].message)
-        await client.end()
-    }
+    // private async connectDB(): Promise<void> {
+    //     const client = new Client()
+    //     await client.connect()
+    //     const res = await client.query('SELECT $1::text as message', ['Hello world!'])
+    //     console.log(res.rows[0].message)
+    //     await client.end()
+    // }
 
 }
 

@@ -1,4 +1,4 @@
-export interface Data {
+export interface DataModel {
     id: number;
     deviceid: number;
     date: String;

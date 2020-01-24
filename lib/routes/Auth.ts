@@ -30,37 +30,30 @@ const createToken = (user: String): String => {
 router.post("/login", async (req: Request, res: Response) => {
   if (req && req.body) {
     const userData: LoginModel = req.body;
-    //Check if username already exists
-    console.log(userData);
+    //Check if user exists
     db.query(
       `SELECT * FROM Customer c WHERE c.username = '${userData.username}'`,
       async (err, result) => {
         if (result) {
-          //Check password match
+          //Check passwords match
           const verified = await bcrypt.compare(
             userData.password,
             result.rows[0].password
           );
-          console.log(verified);
           if (verified) {
             //Update JWT and return it
             const jwttoken = createToken(userData.username);
-
             db.query(
-              `UPDATE Customer SET Customer.jwttoken = ${jwttoken} WHERE Customer.username = '${userData.username}';`,
+              `UPDATE Customer 
+               SET jwttoken = '${jwttoken}' 
+               WHERE username = '${userData.username}';`,
               (err, result) => {
-                console.log(err, result);
-                if (result) {
-                  res.status(OK).send({ jwt: jwttoken });
-                } else {
-                  res.status(GATEWAY_TIMEOUT).send();
-                }
+                if (result) res.status(OK).send({ jwttoken: jwttoken });
+                else res.status(GATEWAY_TIMEOUT).send();
               }
             );
-          }
-
-          res.status(UNAUTHORIZED).send();
-        }
+          } else res.status(UNAUTHORIZED).send();
+        } else res.status(GATEWAY_TIMEOUT).send();
       }
     );
   }
@@ -100,7 +93,7 @@ router.post("/register", async (req: Request, res: Response) => {
                   if (result) {
                     //User created, return JWT
                     console.log("User ", userData.username, " created");
-                    res.status(CREATED).send({ jwt: jwttoken });
+                    res.status(CREATED).send({ jwttoken: jwttoken });
                   } else {
                     //User failed to create, return error
                     console.log(err);

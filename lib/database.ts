@@ -1,7 +1,15 @@
-const Sequelize = require('sequelize');
-// your credentials
-const DATABASE_URL = 'postgres://urngixwljaclyx:f8c15e305829ecab53d3dc3f6a3723f0e8ed0f87cad1e83c23e75db91db790d1@ec2-34-197-171-33.compute-1.amazonaws.com:5432/dd8ai6jnti83ho';
+require("dotenv").config();
+const { Client } = require("pg");
 
-const database = new Sequelize(DATABASE_URL);
+const client = new Client({
+  user: process.env.DB_USER,
+  password: process.env.DB_PASS,
+  database: process.env.DB_DATABASE,
+  port: process.env.DB_PORT,
+  host: process.env.DB_HOST,
+  ssl: true
+});
 
-module.exports = database;
+client.connect();
+
+module.exports = client;

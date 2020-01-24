@@ -3,4 +3,5 @@ export interface UserModel {
     name: String;
     username: String;
     password: String;
+    jwttoken: String;
 }

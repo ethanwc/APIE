@@ -5,7 +5,8 @@ import {
   OK,
   CONFLICT,
   GATEWAY_TIMEOUT,
-  UNAUTHORIZED
+  UNAUTHORIZED,
+  NOT_FOUND
 } from "http-status-codes";
 import { LoginModel, RegisterModel } from "../models/AuthModel";
 import * as jwt from "jsonwebtoken";
@@ -33,7 +34,7 @@ router.post("/login", async (req: Request, res: Response) => {
     db.query(
       `SELECT * FROM Customer c WHERE c.username = '${userData.username}'`,
       async (err, result) => {
-        if (result) {
+        if (result && result.rows.length > 0) {
           //Check passwords match
           const verified = await bcrypt.compare(
             userData.password,
@@ -52,7 +53,7 @@ router.post("/login", async (req: Request, res: Response) => {
               }
             );
           } else res.status(UNAUTHORIZED).send();
-        } else res.status(GATEWAY_TIMEOUT).send();
+        } else res.status(NOT_FOUND).send();
       }
     );
   }

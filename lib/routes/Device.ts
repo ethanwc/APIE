@@ -8,6 +8,7 @@ import {
 } from "http-status-codes";
 import { DeviceModel } from "../models/DeviceModel";
 var db = require("../database");
+const axios = require("axios");
 
 // Router
 const router = Router();
@@ -33,8 +34,33 @@ router.post("/", async (req: Request, res: Response) => {
   if (req && req.body) {
     const username = req.body.user;
     const deviceData: DeviceModel = req.body;
+
     db.query(
-      `UPDATE Device SET devicestate = '${JSON.stringify(deviceData.devicestate)}' WHERE id = ${deviceData.id};`,
+      `SELECT * FROM Device d INNER JOIN Customer c ON d.ownerid = (SELECT c.id FROM Customer c WHERE c.username = '${username}');`,
+      async (err, result) => {
+        if (result) {
+          const address = result.rows[0].address;
+          axios
+            .post(address, {
+              color: { r: 1, g: 5, b: 10 }
+            })
+            .then(res => {
+              console.log(res);
+              res.status(OK).send();
+            })
+            .catch(error => {
+              console.error(error);
+            });
+
+          res.status(OK).send(result.rows);
+        } else res.status(GATEWAY_TIMEOUT).send();
+      }
+    );
+
+    db.query(
+      `UPDATE Device SET devicestate = '${JSON.stringify(
+        deviceData.devicestate
+      )}' WHERE id = ${deviceData.id};`,
       async (err, result) => {
         if (result) {
           res.status(OK).send(result.rows);

@@ -10,6 +10,7 @@ CREATE TABLE Device (
   ID serial PRIMARY KEY,
   ownerid INTEGER REFERENCES Customer(id),
   devicename VARCHAR(255) NOT NULL,
+  deviceaddress VARCHAR(255) NOT NULL,
   devicetype VARCHAR(255) NOT NULL,
   devicestate JSON NOT NULL
 );
